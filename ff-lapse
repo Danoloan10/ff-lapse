@@ -1,0 +1,66 @@
+#!/bin/sh
+
+h='ffmpeg wrapper for recording time-lapses using v4l2.
+usage: timelapse [options]
+options:
+	-d DEVICE		Will record from the device file DEVICE (default=/dev/video0)
+	-n PATH			File used to store temporal variables (default=/tmp/ff-lapse)
+	-s WIDTHxHEIGHT	Dimensions in pixels of the image captured by the device (default=1920x1080)
+	-m N > 9		Max number of images to take into accout for zero padding (default=10^(10))
+	-t N > 0		Time between shots in seconds (default=1)'
+
+tmp="/tmp/ff-lapse"
+dev="/dev/video0"
+size="1920x1080"
+time=1
+max="10000000000"
+
+while getopts 't:m:n:d:s:' OPTION
+do
+	case "$OPTION" in
+		d)			
+			[ -z $OPTARG ] && { echo $h; exit 0; }
+			ls $OPTARG &> /dev/null && dev=$OPTARG || { echo "ERROR: $OPTARG does not exist. Exiting."; exit 0; }
+			;;
+		n)
+			[ -n $OPTARG ] && { echo $h; exit 0; }
+			tmp=$OPTARG
+			;;
+		s)
+			[ -n $OPTARG ] && { echo $h; exit 0; }
+			size=$OPTARG
+			;;
+		m)
+			[ -n $OPTARG ] && { echo $h; exit 0; }
+			echo $OPTARG | egrep -q '^[0-9]+$' && [ $OPTARG -gt 9 ] || { echo $h; exit 0; }
+			max=$OPTARG
+			;;
+		t)
+			[ -n $OPTARG ] && { echo $h; exit 0; }
+			echo $OPTARG | egrep -q '^[0-9]+$' && [ $OPTARG -gt 0 ] || { echo $h; exit 0; }
+			time=$OPTARG
+			;;
+		?)
+			echo $h
+			exit 0
+			;;
+	esac
+done
+			
+			
+
+mkdir shots &> /dev/null || [ -z "`ls shots 2> /dev/null`" ] || { echo "'shots' folder is not empty. Do you want to clear all its contents PERMANENTLY [y/N]?" && { read y && { [ $y == "y" ] &> /dev/null && rm -rf shots/* || { echo "Folder could not be cleared, exiting..."; exit 0;}; }; }; }
+
+pad=$(($max-1))
+pad=${#pad}
+
+echo 0 > $tmp
+
+cmd="$cmd read N < $tmp;"
+cmd="$cmd N="'$(echo $N | sed 's/^0*//')'";"
+cmd="$cmd ffmpeg -f v4l2 -video_size $size -i $dev -vframes 1"
+cmd="$cmd ""shots/"'shot$(printf "%0'"$pad"'d" $N)'".jpeg;"
+cmd="$cmd "'N=$((N+1));'
+cmd="$cmd echo"' $N > '"$tmp"
+
+watch -n 1 -p $cmd

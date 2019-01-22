@@ -5,5 +5,5 @@ This ffmpeg wrapper script can be used to capture time-lapses as a sequence of j
 The script is POSIX compliant.
 
 Dependencies:
--ffmpeg
--watch
+- ffmpeg
+- watch

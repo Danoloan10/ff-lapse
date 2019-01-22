@@ -3,11 +3,13 @@
 h='ffmpeg wrapper for recording time-lapses using v4l2.
 usage: timelapse [options]
 options:
-	-d DEVICE		Will record from the device file DEVICE (default=/dev/video0)
-	-n PATH			File used to store temporal variables (default=/tmp/ff-lapse)
+	-d DEVICE	Will record from the device file DEVICE (default=/dev/video0)
+	-n PATH		File used to store temporal variables (default=/tmp/ff-lapse)
 	-s WIDTHxHEIGHT	Dimensions in pixels of the image captured by the device (default=1920x1080)
-	-m N > 9		Max number of images to take into accout for zero padding (default=10^(10))
-	-t N > 0		Time between $out in seconds (default=1)'
+	-m N > 9	Max number of images to take into accout for zero padding (default=10^(10))
+	-t N > 0	Time between $out in seconds (default=1)
+	-o PATH		Path to store images (default=shots/)
+	-h		Show this help'
 
 tmp="/tmp/ff-lapse"
 dev="/dev/video0"

@@ -60,7 +60,20 @@ done
 			
 			
 
-mkdir -p $out && { [ -z "`ls $out`" ] || { echo "'$out' folder is not empty. Do you want to clear all its contents PERMANENTLY [y/N]?" && { read y && { [ $y == "y" ] && rm -r $out/* || { echo "Folder could not be cleared, exiting..."; exit 0;}; }; }; };} || { echo "Error creating directory '$out', exiting..."; exit 0; }
+if [ -n "`ls $out`" ]; then
+	echo "'$out' folder is not empty. Do you want to clear all its contents PERMANENTLY [y/N]?";
+	read y;
+	if [ $y == "y" ]; then
+		if ! rm -r $out/*; then
+			echo "Folder could not be cleared, exiting...";
+			exit 1;
+		fi
+	else
+		echo "Error creating directory '$out', exiting...";
+		exit 1;
+	fi
+fi
+mkdir -p $out
 
 pad=$(($max-1))
 pad=${#pad}
